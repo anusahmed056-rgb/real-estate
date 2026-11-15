@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApexHaven Realty | Multi-Page Real Estate Portal</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary-dark: #0f172a;
+      --accent-gold: #d97706;
+      --accent-gold-hover: #b45309;
+      --bg-light: #f8fafc;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--primary-dark);
+      overflow-x: hidden;
+    }
+
+    /* Multi-Page SPA View Handling */
+    .page-section {
+      display: none;
+      animation: fadeIn 0.35s ease-in-out;
+    }
+    .page-section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
+    }
+    .navbar-brand {
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--primary-dark) !important;
+      letter-spacing: -0.5px;
+    }
+    .navbar-brand span {
+      color: var(--accent-gold);
+    }
+    .nav-link {
+      font-weight: 600;
+      color: var(--primary-dark) !important;
+      margin: 0 8px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-link:hover, .nav-link.active-nav {
+      color: var(--accent-gold) !important;
+    }
+
+    /* Buttons */
+    .btn-gold {
+      background-color: var(--accent-gold);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      transition: all 0.25s ease;
+    }
+    .btn-gold:hover {
+      background-color: var(--accent-gold-hover);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .btn-dark-custom {
+      background-color: var(--primary-dark);
+      color: #fff;
+      font-weight: 600;
+    }
+    .btn-dark-custom:hover {
+      background-color: #1e293b;
+      color: #fff;
+    }
+
+    /* Hero Section */
+    .hero-banner {
+      background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)),
+                  url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      min-height: 82vh;
+      display: flex;
+      align-items: center;
+      color: #fff;
+    }
+    .search-box-glass {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 24px;
+      color: var(--primary-dark);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Property Cards */
+    .property-card {
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+    }
+    .property-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    .property-img-wrap {
+      position: relative;
+      height: 230px;
+      overflow: hidden;
+    }
+    .property-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .property-card:hover .property-img-wrap img {
+      transform: scale(1.05);
+    }
+    .badge-status {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: var(--primary-dark);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-type {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--accent-gold);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .price-tag {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+
+    /* Subpage Header */
+    .subpage-header {
+      background: var(--primary-dark);
+      color: #fff;
+      padding: 65px 0;
+    }
+
+    /* Agent Cards */
+    .agent-card {
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .agent-card:hover {
+      transform: translateY(-5px);
+    }
+    .agent-card img {
+      height: 280px;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--primary-dark);
+      color: #cbd5e1;
+    }
+    footer a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    footer a:hover {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <nav class="navbar navbar-expand-lg sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#" onclick="navigateTo('home')">
+        <i class="bi bi-buildings-fill text-warning me-1"></i>Apex<span>Haven</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active-nav" data-page="home" onclick="navigateTo('home')">Home</a></li>
+          <li class="nav-item"><a class="nav-link" data-page="properties" onclick="navigateTo('properties')">Properties</a></li>
+          <li class="nav-item"><a class="nav-link" data-page="agents" onclick="navigateTo('agents')">Agents</a></li>
+          <li class="nav-item"><a class="nav-link" data-page="about" onclick="navigateTo('about')">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" data-page="contact" onclick="navigateTo('contact')">Contact</a></li>
+        </ul>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-dark rounded-pill px-3" onclick="navigateTo('properties')">Browse Listings</button>
+          <button class="btn btn-gold rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#scheduleModal">Book Tour</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= PAGE 1: HOME ================= -->
+  <main id="page-home" class="page-section active">
+    <!-- Hero -->
+    <section class="hero-banner">
+      <div class="container py-5">
+        <div class="row justify-content-center text-center mb-4">
+          <div class="col-lg-8">
+            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-3">LUXURY & MODERN LIVING</span>
+            <h1 class="display-4 fw-bold mb-3">Find a Place You’ll Truly Love Calling Home</h1>
+            <p class="lead text-light opacity-75">Explore verified luxury villas, modern apartments, and prime commercial spaces curated by top local experts.</p>
+          </div>
+        </div>
+
+        <!-- Quick Search Bar -->
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="search-box-glass">
+              <form class="row g-3 align-items-end" onsubmit="handleHeroSearch(event)">
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold small text-muted">Location</label>
+                  <input type="text" id="heroLocation" class="form-control form-control-lg" placeholder="e.g. Beverly Hills, Miami, Austin" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold small text-muted">Property Type</label>
+                  <select id="heroType" class="form-select form-select-lg">
+                    <option value="All">All Types</option>
+                    <option value="Villa">Villa</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Penthouse">Penthouse</option>
+                    <option value="Townhouse">Townhouse</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold small text-muted">Status</label>
+                  <select id="heroStatus" class="form-select form-select-lg">
+                    <option value="All">Buy or Rent</option>
+                    <option value="For Sale">For Sale</option>
+                    <option value="For Rent">For Rent</option>
+                  </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                  <button type="submit" class="btn btn-gold btn-lg"><i class="bi bi-search me-1"></i>Search</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Strip -->
+    <section class="py-5 bg-white border-bottom">
+      <div class="container">
+        <div class="row text-center g-4">
+          <div class="col-6 col-md-3">
+            <h2 class="fw-bold text-warning mb-0">1,450+</h2>
+            <p class="text-muted mb-0">Premium Properties</p>
+          </div>
+          <div class="col-6 col-md-3">
+            <h2 class="fw-bold text-warning mb-0">98%</h2>
+            <p class="text-muted mb-0">Client Satisfaction</p>
+          </div>
+          <div class="col-6 col-md-3">
+            <h2 class="fw-bold text-warning mb-0">$2.4B</h2>
+            <p class="text-muted mb-0">Total Sales Volume</p>
+          </div>
+          <div class="col-6 col-md-3">
+            <h2 class="fw-bold text-warning mb-0">65+</h2>
+            <p class="text-muted mb-0">Award-Winning Agents</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Listings -->
+    <section class="py-5">
+      <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+          <div>
+            <span class="text-warning fw-bold text-uppercase small">Handpicked Selection</span>
+            <h2 class="fw-bold mb-0">Featured Properties</h2>
+          </div>
+          <button class="btn btn-dark-custom rounded-pill px-4" onclick="navigateTo('properties')">
+            View All Properties <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+        <div class="row g-4" id="featuredListingsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-5 bg-white">
+      <div class="container py-3">
+        <div class="text-center mb-5">
+          <span class="text-warning fw-bold text-uppercase small">Our Advantage</span>
+          <h2 class="fw-bold">Why Work With ApexHaven?</h2>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="p-4 rounded-4 bg-light h-100">
+              <div class="fs-1 text-warning mb-3"><i class="bi bi-shield-check"></i></div>
+              <h5 class="fw-bold">100% Verified Listings</h5>
+              <p class="text-muted mb-0">Every property undergoes strict legal, structural, and valuation checks before hitting our marketplace.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 rounded-4 bg-light h-100">
+              <div class="fs-1 text-warning mb-3"><i class="bi bi-graph-up-arrow"></i></div>
+              <h5 class="fw-bold">Data-Driven Pricing</h5>
+              <p class="text-muted mb-0">Our real-time neighborhood analytics ensure you never overpay as a buyer or leave money on the table as a seller.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 rounded-4 bg-light h-100">
+              <div class="fs-1 text-warning mb-3"><i class="bi bi-key"></i></div>
+              <h5 class="fw-bold">End-to-End Closing Support</h5>
+              <p class="text-muted mb-0">From mortgage pre-approval to final title transfer, our dedicated advisors streamline every step.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PAGE 2: PROPERTIES ================= -->
+  <main id="page-properties" class="page-section">
+    <div class="subpage-header text-center">
+      <div class="container">
+        <h1 class="fw-bold">Explore All Properties</h1>
+        <p class="text-light opacity-75 mb-0">Filter by type, status, or location to find your ideal match.</p>
+      </div>
+    </div>
+
+    <section class="py-5">
+      <div class="container">
+        <!-- Filter Bar -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-5">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <input type="text" id="filterSearch" class="form-control" placeholder="Search city or property title..." onkeyup="renderAllProperties()" />
+            </div>
+            <div class="col-md-3">
+              <select id="filterType" class="form-select" onchange="renderAllProperties()">
+                <option value="All">All Property Types</option>
+                <option value="Villa">Villa</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Penthouse">Penthouse</option>
+                <option value="Townhouse">Townhouse</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select id="filterStatus" class="form-select" onchange="renderAllProperties()">
+                <option value="All">All Statuses</option>
+                <option value="For Sale">For Sale</option>
+                <option value="For Rent">For Rent</option>
+              </select>
+            </div>
+            <div class="col-md-2 d-grid">
+              <button class="btn btn-outline-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Count -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="fw-bold mb-0" id="resultsCount">Showing 6 Properties</h5>
+        </div>
+
+        <!-- Grid -->
+        <div class="row g-4" id="allPropertiesGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PAGE 3: PROPERTY DETAILS ================= -->
+  <main id="page-details" class="page-section">
+    <section class="py-5">
+      <div class="container">
+        <button class="btn btn-outline-dark rounded-pill mb-4" onclick="navigateTo('properties')">
+          <i class="bi bi-arrow-left me-1"></i> Back to Properties
+        </button>
+        <div id="propertyDetailContent"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PAGE 4: AGENTS ================= -->
+  <main id="page-agents" class="page-section">
+    <div class="subpage-header text-center">
+      <div class="container">
+        <h1 class="fw-bold">Meet Our Real Estate Advisors</h1>
+        <p class="text-light opacity-75 mb-0">Experienced local specialists dedicated to your property goals.</p>
+      </div>
+    </div>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="agent-card">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Agent" />
+              <div class="p-4">
+                <h5 class="fw-bold mb-1">Elena Vance</h5>
+                <p class="text-warning small fw-semibold mb-2">Senior Luxury Specialist</p>
+                <p class="text-muted small">12+ years closing high-value coastal estates and architectural homes.</p>
+                <button class="btn btn-dark-custom btn-sm rounded-pill w-100" data-bs-toggle="modal" data-bs-target="#scheduleModal">Contact Elena</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="agent-card">
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80" alt="Agent" />
+              <div class="p-4">
+                <h5 class="fw-bold mb-1">Marcus Sterling</h5>
+                <p class="text-warning small fw-semibold mb-2">Commercial & Penthouse Lead</p>
+                <p class="text-muted small">Expert in downtown penthouses, investment portfolios, and multi-family assets.</p>
+                <button class="btn btn-dark-custom btn-sm rounded-pill w-100" data-bs-toggle="modal" data-bs-target="#scheduleModal">Contact Marcus</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="agent-card">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80" alt="Agent" />
+              <div class="p-4">
+                <h5 class="fw-bold mb-1">Sophia Chen</h5>
+                <p class="text-warning small fw-semibold mb-2">Residential Buyer Advisor</p>
+                <p class="text-muted small">Helping families and first-time buyers navigate competitive urban markets.</p>
+                <button class="btn btn-dark-custom btn-sm rounded-pill w-100" data-bs-toggle="modal" data-bs-target="#scheduleModal">Contact Sophia</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="agent-card">
+              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80" alt="Agent" />
+              <div class="p-4">
+                <h5 class="fw-bold mb-1">David Thorne</h5>
+                <p class="text-warning small fw-semibold mb-2">Executive Leasing Director</p>
+                <p class="text-muted small">Specializing in corporate relocations and turnkey luxury rentals.</p>
+                <button class="btn btn-dark-custom btn-sm rounded-pill w-100" data-bs-toggle="modal" data-bs-target="#scheduleModal">Contact David</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PAGE 5: ABOUT US ================= -->
+  <main id="page-about" class="page-section">
+    <div class="subpage-header text-center">
+      <div class="container">
+        <h1 class="fw-bold">About ApexHaven Realty</h1>
+        <p class="text-light opacity-75 mb-0">Redefining modern real estate with transparency, design, and trust.</p>
+      </div>
+    </div>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80" class="img-fluid rounded-4 shadow" alt="Modern Architecture" />
+          </div>
+          <div class="col-lg-6">
+            <span class="text-warning fw-bold text-uppercase small">Our Story</span>
+            <h2 class="fw-bold mt-1 mb-3">A Smarter Way to Buy, Sell & Invest in Property</h2>
+            <p class="text-muted">Founded in 2015, ApexHaven Realty blends boutique white-glove service with modern market intelligence. We believe finding a home should be inspiring, transparent, and stress-free.</p>
+            <p class="text-muted mb-4">Whether you are acquiring a primary residence, leasing an executive penthouse, or expanding a real estate portfolio, our advisors provide unmatched neighborhood insight and negotiation power.</p>
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm">
+                  <h4 class="fw-bold text-warning mb-0">10+ Years</h4>
+                  <small class="text-muted">Industry Leadership</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm">
+                  <h4 class="fw-bold text-warning mb-0">18 Cities</h4>
+                  <small class="text-muted">Active Markets</small>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-gold rounded-pill px-4 py-2" onclick="navigateTo('contact')">Work With Us</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PAGE 6: CONTACT ================= -->
+  <main id="page-contact" class="page-section">
+    <div class="subpage-header text-center">
+      <div class="container">
+        <h1 class="fw-bold">Get In Touch</h1>
+        <p class="text-light opacity-75 mb-0">Have questions about a property or valuation? Our team responds within 2 hours.</p>
+      </div>
+    </div>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <h4 class="fw-bold mb-4">Headquarters</h4>
+              <div class="d-flex mb-3">
+                <i class="bi bi-geo-alt-fill text-warning fs-4 me-3"></i>
+                <div>
+                  <h6 class="fw-bold mb-0">Office Address</h6>
+                  <p class="text-muted small mb-0">450 Wilshire Blvd, Suite 900, Beverly Hills, CA 90210</p>
+                </div>
+              </div>
+              <div class="d-flex mb-3">
+                <i class="bi bi-telephone-fill text-warning fs-4 me-3"></i>
+                <div>
+                  <h6 class="fw-bold mb-0">Phone</h6>
+                  <p class="text-muted small mb-0">+1 (310) 555-0194</p>
+                </div>
+              </div>
+              <div class="d-flex mb-4">
+                <i class="bi bi-envelope-fill text-warning fs-4 me-3"></i>
+                <div>
+                  <h6 class="fw-bold mb-0">Email</h6>
+                  <p class="text-muted small mb-0">concierge@apexhaven.com</p>
+                </div>
+              </div>
+              <hr />
+              <h6 class="fw-bold">Business Hours</h6>
+              <p class="text-muted small mb-0">Mon – Sat: 9:00 AM – 7:00 PM<br />Sun: By Private Appointment</p>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+              <h4 class="fw-bold mb-3">Send Us a Message</h4>
+              <form onsubmit="handleContactSubmit(event)">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Full Name</label>
+                    <input type="text" class="form-control" required placeholder="John Doe" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Email Address</label>
+                    <input type="email" class="form-control" required placeholder="john@example.com" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Phone Number</label>
+                    <input type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Inquiry Type</label>
+                    <select class="form-select">
+                      <option>Buying a Property</option>
+                      <option>Selling a Property</option>
+                      <option>Renting / Leasing</option>
+                      <option>Property Valuation</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Message</label>
+                    <textarea class="form-control" rows="4" required placeholder="Tell us about your budget, preferred neighborhood, or timeline..."></textarea>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-gold px-5 py-2 rounded-pill">Send Message</button>
+                  </div>
+                </div>
+              </form>
+              <div id="contactSuccessAlert" class="alert alert-success mt-3 d-none">
+                <i class="bi bi-check-circle-fill me-2"></i>Thank you! Your inquiry has been received. An advisor will reach out shortly.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= SCHEDULE TOUR MODAL ================= -->
+  <div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Schedule a Private Viewing</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="handleTourSubmit(event)">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Your Name</label>
+              <input type="text" class="form-control" required placeholder="Jane Smith" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Email or Phone</label>
+              <input type="text" class="form-control" required placeholder="jane@example.com" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Preferred Date</label>
+              <input type="date" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Tour Format</label>
+              <select class="form-select">
+                <option>In-Person Walkthrough</option>
+                <option>Live Video Tour (FaceTime / Zoom)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-gold w-100 rounded-pill py-2">Confirm Booking</button>
+          </form>
+          <div id="tourAlert" class="alert alert-success mt-3 mb-0 d-none">
+            Tour request confirmed! Check your inbox for calendar details.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="pt-5 pb-4 mt-5">
+    <div class="container">
+      <div class="row g-4 pb-4 border-bottom border-secondary">
+        <div class="col-lg-4">
+          <h4 class="fw-bold text-white mb-3"><i class="bi bi-buildings-fill text-warning me-1"></i>Apex<span class="text-warning">Haven</span></h4>
+          <p class="small">Connecting discerning buyers, sellers, and investors with extraordinary residential and commercial properties nationwide.</p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-white fw-bold mb-3">Quick Links</h6>
+          <ul class="list-unstyled small d-grid gap-2">
+            <li><a onclick="navigateTo('home')">Home</a></li>
+            <li><a onclick="navigateTo('properties')">Properties</a></li>
+            <li><a onclick="navigateTo('agents')">Our Agents</a></li>
+            <li><a onclick="navigateTo('about')">About Us</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h6 class="text-white fw-bold mb-3">Property Categories</h6>
+          <ul class="list-unstyled small d-grid gap-2">
+            <li><a onclick="quickCategoryFilter('Villa')">Luxury Villas</a></li>
+            <li><a onclick="quickCategoryFilter('Penthouse')">City Penthouses</a></li>
+            <li><a onclick="quickCategoryFilter('Apartment')">Modern Apartments</a></li>
+            <li><a onclick="quickCategoryFilter('Townhouse')">Suburban Townhouses</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3">
+          <h6 class="text-white fw-bold mb-3">Newsletter</h6>
+          <p class="small">Get off-market luxury listings sent weekly.</p>
+          <div class="input-group">
+            <input type="email" class="form-control form-control-sm" placeholder="Your email" />
+            <button class="btn btn-gold btn-sm" type="button" onclick="alert('Subscribed to ApexHaven weekly listings!')">Join</button>
+          </div>
+        </div>
+      </div>
+      <div class="text-center pt-4 small">
+        &copy; 2026 ApexHaven Realty Group. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Multi-Page Routing & Property Data Script -->
+  <script>
+    const propertiesData = [
+      {
+        id: 1,
+        title: "The Aurelia Glass Villa",
+        location: "Beverly Hills, CA",
+        price: "$4,850,000",
+        status: "For Sale",
+        type: "Villa",
+        beds: 5,
+        baths: 6,
+        sqft: "5,400",
+        featured: true,
+        image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=900&q=80",
+        description: "Architectural masterpiece featuring floor-to-ceiling Fleetwood glass walls, zero-edge infinity pool, chef's marble kitchen, and panoramic canyon-to-ocean views.",
+        amenities: ["Infinity Pool", "Smart Home Automation", "Wine Cellar", "3-Car Garage", "Home Theater"]
+      },
+      {
+        id: 2,
+        title: "Skyline Horizon Penthouse",
+        location: "Miami, FL",
+        price: "$14,500 / mo",
+        status: "For Rent",
+        type: "Penthouse",
+        beds: 3,
+        baths: 4,
+        sqft: "3,200",
+        featured: true,
+        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80",
+        description: "Full-floor waterfront penthouse offering 360-degree Biscayne Bay views, private elevator foyer, wrap-around sunset terrace, and 24/7 concierge access.",
+        amenities: ["Private Elevator", "Ocean View Terrace", "Resort Spa & Gym", "Valet Parking", "24/7 Security"]
+      },
+      {
+        id: 3,
+        title: "Oakridge Modern Townhouse",
+        location: "Austin, TX",
+        price: "$1,120,000",
+        status: "For Sale",
+        type: "Townhouse",
+        beds: 4,
+        baths: 3,
+        sqft: "2,850",
+        featured: true,
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
+        description: "Warm contemporary residence located minutes from Lady Bird Lake. Features white oak flooring, private rooftop deck, and EV-ready garage.",
+        amenities: ["Rooftop Lounge", "EV Charger", "White Oak Floors", "Fenced Courtyard", "Walkable Neighborhood"]
+      },
+      {
+        id: 4,
+        title: "SoHo Cast-Iron Loft Apartment",
+        location: "New York, NY",
+        price: "$8,900 / mo",
+        status: "For Rent",
+        type: "Apartment",
+        beds: 2,
+        baths: 2,
+        sqft: "1,950",
+        featured: false,
+        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+        description: "Sun-drenched SoHo loft boasting 13-foot ceilings, exposed brick, oversized arched windows, and custom Italian cabinetry.",
+        amenities: ["13ft Ceilings", "Keyed Elevator", "In-Unit Laundry", "Chef's Kitchen", "Pet Friendly"]
+      },
+      {
+        id: 5,
+        title: "Emerald Bay Waterfront Estate",
+        location: "Seattle, WA",
+        price: "$3,650,000",
+        status: "For Sale",
+        type: "Villa",
+        beds: 5,
+        baths: 4,
+        sqft: "4,700",
+        featured: false,
+        image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=900&q=80",
+        description: "Serene Lake Washington retreat with private deep-water dock, cedar-lined sauna, and expansive outdoor entertaining pavilion.",
+        amenities: ["Private Boat Dock", "Cedar Sauna", "Outdoor Kitchen", "Guest Suite", "Heated Floors"]
+      },
+      {
+        id: 6,
+        title: "The Sterling Park Residence",
+        location: "Chicago, IL",
+        price: "$945,000",
+        status: "For Sale",
+        type: "Apartment",
+        beds: 3,
+        baths: 3,
+        sqft: "2,300",
+        featured: false,
+        image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80",
+        description: "Sophisticated Gold Coast residence overlooking Lincoln Park with herringbone hardwood floors, butler's pantry, and private balcony.",
+        amenities: ["Park Views", "Doorman Building", "Fitness Center", "Private Balcony", "Storage Locker"]
+      }
+    ];
+
+    // Multi-Page Navigation Controller
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
+
+      // Update active navbar link
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active-nav');
+        if (link.getAttribute('data-page') === pageId) {
+          link.classList.add('active-nav');
+        }
+      });
+
+      // Collapse mobile navbar if open
+      const navCollapse = document.getElementById('mainNav');
+      if (navCollapse.classList.contains('show')) {
+        bootstrap.Collapse.getInstance(navCollapse).hide();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Build Property Card HTML
+    function createPropertyCard(prop) {
+      return `
+        <div class="col-md-6 col-lg-4">
+          <div class="property-card d-flex flex-column">
+            <div class="property-img-wrap">
+              <img src="${prop.image}" alt="${prop.title}" />
+              <span class="badge-status">${prop.status}</span>
+              <span class="badge-type">${prop.type}</span>
+            </div>
+            <div class="p-4 flex-grow-1 d-flex flex-column">
+              <div class="price-tag mb-1">${prop.price}</div>
+              <h5 class="fw-bold mb-1">${prop.title}</h5>
+              <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-warning me-1"></i>${prop.location}</p>
+              <div class="d-flex justify-content-between text-muted small border-top border-bottom py-2 mb-3">
+                <span><i class="bi bi-door-closed me-1"></i>${prop.beds} Beds</span>
+                <span><i class="bi bi-droplet me-1"></i>${prop.baths} Baths</span>
+                <span><i class="bi bi-arrows-fullscreen me-1"></i>${prop.sqft} sqft</span>
+              </div>
+              <button class="btn btn-dark-custom w-100 rounded-pill mt-auto" onclick="viewPropertyDetails(${prop.id})">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Featured Listings on Home Page
+    function renderFeatured() {
+      const grid = document.getElementById('featuredListingsGrid');
+      const featured = propertiesData.filter(p => p.featured);
+      grid.innerHTML = featured.map(createPropertyCard).join('');
+    }
+
+    // Render Filtered Properties on Properties Page
+    function renderAllProperties() {
+      const searchVal = document.getElementById('filterSearch').value.toLowerCase();
+      const typeVal = document.getElementById('filterType').value;
+      const statusVal = document.getElementById('filterStatus').value;
+
+      const filtered = propertiesData.filter(p => {
+        const matchesSearch = p.title.toLowerCase().includes(searchVal) || p.location.toLowerCase().includes(searchVal);
+        const matchesType = typeVal === 'All' || p.type === typeVal;
+        const matchesStatus = statusVal === 'All' || p.status === statusVal;
+        return matchesSearch && matchesType && matchesStatus;
+      });
+
+      document.getElementById('resultsCount').innerText = `Showing ${filtered.length} ${filtered.length === 1 ? 'Property' : 'Properties'}`;
+      const grid = document.getElementById('allPropertiesGrid');
+      grid.innerHTML = filtered.length
+        ? filtered.map(createPropertyCard).join('')
+        : `<div class="col-12 text-center py-5"><h5 class="text-muted">No properties match your filters. Try resetting!</h5></div>`;
+    }
+
+    // Hero Search Redirect
+    function handleHeroSearch(e) {
+      e.preventDefault();
+      document.getElementById('filterSearch').value = document.getElementById('heroLocation').value;
+      document.getElementById('filterType').value = document.getElementById('heroType').value;
+      document.getElementById('filterStatus').value = document.getElementById('heroStatus').value;
+      renderAllProperties();
+      navigateTo('properties');
+    }
+
+    // Footer Quick Category Filter
+    function quickCategoryFilter(type) {
+      resetFilters();
+      document.getElementById('filterType').value = type;
+      renderAllProperties();
+      navigateTo('properties');
+    }
+
+    function resetFilters() {
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterType').value = 'All';
+      document.getElementById('filterStatus').value = 'All';
+      renderAllProperties();
+    }
+
+    // Single Property Details View
+    function viewPropertyDetails(id) {
+      const prop = propertiesData.find(p => p.id === id);
+      if (!prop) return;
+
+      const amenitiesHTML = prop.amenities.map(item =>
+        `<div class="col-sm-6"><i class="bi bi-check-circle-fill text-warning me-2"></i>${item}</div>`
+      ).join('');
+
+      document.getElementById('propertyDetailContent').innerHTML = `
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <img src="${prop.image}" class="img-fluid rounded-4 w-100 shadow-sm mb-4" style="max-height: 480px; object-fit: cover;" alt="${prop.title}" />
+            <div class="bg-white p-4 rounded-4 shadow-sm">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div>
+                  <span class="badge bg-dark me-2">${prop.status}</span>
+                  <span class="badge bg-warning text-dark">${prop.type}</span>
+                  <h2 class="fw-bold mt-2 mb-1">${prop.title}</h2>
+                  <p class="text-muted mb-0"><i class="bi bi-geo-alt-fill text-warning me-1"></i>${prop.location}</p>
+                </div>
+                <div class="price-tag fs-2">${prop.price}</div>
+              </div>
+              <hr />
+              <div class="row text-center py-2 mb-3">
+                <div class="col-4 border-end"><strong>${prop.beds}</strong><br><small class="text-muted">Bedrooms</small></div>
+                <div class="col-4 border-end"><strong>${prop.baths}</strong><br><small class="text-muted">Bathrooms</small></div>
+                <div class="col-4"><strong>${prop.sqft}</strong><br><small class="text-muted">Square Feet</small></div>
+              </div>
+              <h5 class="fw-bold mt-4">Property Overview</h5>
+              <p class="text-muted">${prop.description}</p>
+              <h5 class="fw-bold mt-4 mb-3">Key Features & Amenities</h5>
+              <div class="row g-2">${amenitiesHTML}</div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="bg-white p-4 rounded-4 shadow-sm sticky-top" style="top: 100px;">
+              <h5 class="fw-bold mb-3">Interested in this property?</h5>
+              <p class="text-muted small">Schedule a private tour or request the full floor plan and disclosure packet.</p>
+              <button class="btn btn-gold w-100 rounded-pill py-2 mb-2" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                <i class="bi bi-calendar-event me-1"></i> Schedule a Tour
+              </button>
+              <button class="btn btn-outline-dark w-100 rounded-pill py-2" onclick="navigateTo('contact')">
+                <i class="bi bi-chat-dots me-1"></i> Ask an Advisor
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      navigateTo('details');
+    }
+
+    // Form Handlers
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      e.target.reset();
+      document.getElementById('contactSuccessAlert').classList.remove('d-none');
+    }
+
+    function handleTourSubmit(e) {
+      e.preventDefault();
+      e.target.reset();
+      document.getElementById('tourAlert').classList.remove('d-none');
+    }
+
+    // Initialize
+    renderFeatured();
+    renderAllProperties();
+  </script>
+</body>
+</html>
